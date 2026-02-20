@@ -13,12 +13,12 @@ class DbHelper {
   }
 
   Database? _mDB;
-  String DB_NAME = "notesDB.db";
-  String TABLE_NOTE = "note";
-  String COLUMN_NOTE_ID = "note_id";
-  String COLUMN_NOTE_TITLE = "note_title";
-  String COLUMN_NOTE_DESC = "note_desc";
-  String COLUMN_NOTE_CREATED_AT = "note_created_at";
+  static String DB_NAME = "notesDB.db";
+  static String TABLE_NOTE = "note";
+  static String COLUMN_NOTE_ID = "note_id";
+  static String COLUMN_NOTE_TITLE = "note_title";
+  static String COLUMN_NOTE_DESC = "note_desc";
+  static String COLUMN_NOTE_CREATED_AT = "note_created_at";
 
   Future<Database> initDB() async {
     _mDB ??= await openDB();
@@ -43,6 +43,11 @@ class DbHelper {
 
   ///queries
   ///select
+  Future<List<Map<String, dynamic>>> getAllNotes() async{
+    Database db = await initDB();
+    List<Map<String, dynamic>> mNotes = await db.query(TABLE_NOTE);
+    return mNotes;
+  }
   ///insert
   Future<bool> addNote({required String title, required String desc}) async{
     Database db = await initDB();
