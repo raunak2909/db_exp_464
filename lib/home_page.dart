@@ -1,4 +1,6 @@
+import 'package:db_exp_464/add_note_page.dart';
 import 'package:db_exp_464/db_helper.dart';
+import 'package:db_exp_464/note_model.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,15 +10,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DbHelper? dbHelper;
-  List<Map<String, dynamic>> mNotes = [];
+  List<NoteModel> mNotes = [];
   TextEditingController titleController = TextEditingController();
   TextEditingController descController = TextEditingController();
 
   void addNoteFromUI() async {
     //DbHelper dbHelper = DbHelper.getInstance();
     bool check = await dbHelper!.addNote(
-      title: titleController.text,
-      desc: descController.text,
+      newNote: NoteModel(
+        title: titleController.text,
+        desc: descController.text,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+      ),
     );
     if (check) {
       fetchNoteFromUI();
@@ -49,33 +54,45 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.black,
                     fontSize: 16,
                   ),
-                  title: Text(mNotes[index][DbHelper.COLUMN_NOTE_TITLE]),
-                  subtitle: Text(mNotes[index][DbHelper.COLUMN_NOTE_DESC]),
+                  title: Text(mNotes[index].title),
+                  subtitle: Text(mNotes[index].desc),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         onPressed: () async {
-                          showModalBottomSheet(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddNotePage(
+                                isUpdate: true,
+                                mId: mNotes[index].id,
+                                mTitle: mNotes[index].title,
+                                mDesc: mNotes[index].desc,
+                              ),
+                            ),
+                          );
+
+                          /*showModalBottomSheet(
                             context: context,
                             builder: (_) {
                               titleController.text =
-                                  mNotes[index][DbHelper.COLUMN_NOTE_TITLE];
+                                  mNotes[index].title;
                               descController.text =
-                                  mNotes[index][DbHelper.COLUMN_NOTE_DESC];
+                                  mNotes[index].desc;
                               return myBottomSheetUI(
                                 isUpdate: true,
-                                mID: mNotes[index][DbHelper.COLUMN_NOTE_ID],
+                                mID: mNotes[index].id,
                               );
                             },
-                          );
+                          );*/
                         },
                         icon: Icon(Icons.edit),
                       ),
                       IconButton(
                         onPressed: () async {
                           bool isDeleted = await dbHelper!.deleteNote(
-                            id: mNotes[index][DbHelper.COLUMN_NOTE_ID],
+                            id: mNotes[index].id ?? 0,
                           );
 
                           if (isDeleted) {
@@ -127,7 +144,12 @@ class _HomePageState extends State<HomePage> {
           : Center(child: Text('No Notes yet!!')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          titleController.text = "";
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddNotePage()),
+          );
+
+          /*titleController.text = "";
           descController.clear();
 
           showModalBottomSheet(
@@ -135,14 +157,14 @@ class _HomePageState extends State<HomePage> {
             builder: (_) {
               return myBottomSheetUI();
             },
-          );
+          );*/
         },
         child: Icon(Icons.add),
       ),
     );
   }
 
-  Widget myBottomSheetUI({bool isUpdate = false, int? mID}) {
+  /*Widget myBottomSheetUI({bool isUpdate = false, int? mID}) {
     return Container(
       padding: EdgeInsets.all(11),
       child: Column(
@@ -218,5 +240,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
+  }*/
 }
